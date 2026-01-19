@@ -19,12 +19,16 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Virtual environments
 venv/
 ENV/
 env/
 .venv
+env.bak/
+venv.bak/
 
 # IDE
 .vscode/
@@ -33,14 +37,39 @@ env/
 *.swo
 *~
 .DS_Store
+*.sublime-workspace
+*.sublime-project
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
+.tox/
+.hypothesis/
 
 # Project specific
 *.nexus.bak
 .nexus_cache/
 build_output/
 dist_output/
+.nxs/
+
+# Installation artifacts
+.install.done
+install.log
+
+# OS specific
+Thumbs.db
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Termux specific
+.termux/
+!.termux/
+
+# Mobile/ARM specific builds
+arm64-build/
+armv7-build/
+x86_64-build/
+x86-build/

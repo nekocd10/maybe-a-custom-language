@@ -2,17 +2,22 @@
 
 A simple, intuitive programming language designed for clarity and expressiveness. Nexus combines the ease of Python with the structure of statically-typed languages.
 
-## Quick Install
+## 🚀 Quick Install (One-Liner)
+
+Works on **all devices**: Linux, macOS, Windows, Termux, 32-bit, 64-bit, ARM, and more.
 
 ```bash
-# One-liner installation from anywhere
 bash <(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
 ```
 
-Or locally from the repository:
-```bash
-bash install.sh
-```
+**What it does automatically:**
+- ✅ Detects your OS and architecture
+- ✅ Installs everything needed
+- ✅ Cleans up markdown files
+- ✅ Creates global `nexus` and `nxs` commands
+- ✅ Sets up `~/.nxs/` folder
+
+---
 
 ## Quick Start
 
@@ -24,7 +29,62 @@ echo 'println "Hello, Nexus!"' > hello.nexus
 nexus hello.nexus
 ```
 
-## Features
+---
+
+<details>
+<summary><b>📱 Installation Methods & Device Support</b></summary>
+
+### Installation Methods
+
+**Method 1: Curl (Recommended)**
+```bash
+bash <(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
+```
+
+**Method 2: Wget**
+```bash
+bash <(wget -qO- https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
+```
+
+**Method 3: Local Repository**
+```bash
+git clone https://github.com/nekocd10/maybe-a-custom-language
+cd maybe-a-custom-language
+bash install.sh
+```
+
+**Method 4: Termux (Mobile)**
+```bash
+pkg install python curl
+bash <(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
+```
+
+### Supported Devices
+
+| Device | 32-bit | 64-bit | Termux | Status |
+|--------|--------|--------|--------|--------|
+| Linux | ✅ | ✅ | N/A | Full |
+| macOS | N/A | ✅ | N/A | Full |
+| Windows | ✅ | ✅ | N/A | Full |
+| Raspberry Pi | ✅ | ✅ | N/A | Full |
+| Android (Termux) | ✅ | ✅ | ✅ | Full |
+| ARM Devices | ✅ | ✅ | ✅ | Full |
+
+### Verify Installation
+```bash
+nexus --version
+nexus --help
+nxs --version
+```
+
+</details>
+
+---
+
+<details>
+<summary><b>📚 Features & Examples</b></summary>
+
+### Language Features
 
 - **Clear Syntax** - Easy to read and understand
 - **Type System** - Optional type annotations with smart inference
@@ -34,61 +94,16 @@ nexus hello.nexus
 - **Interoperability** - Call Python and other languages
 - **Full Stack** - Build web apps with built-in Express module
 
-## Project Structure
+### Code Examples
 
-```
-maybe-a-custom-language/
-├── src/                 # Core interpreter source code
-│   ├── lexer.py         # Tokenization
-│   ├── parser.py        # AST generation
-│   ├── interpreter.py   # Execution engine
-│   └── cli.py           # Command-line interface
-├── docs/                # Comprehensive documentation
-│   ├── DOCUMENTATION.md # Complete guide (all in one)
-│   ├── SPEC.md          # Language specification
-│   └── FULLSTACK.md     # Web development guide
-├── examples/            # Example Nexus programs
-├── nxs_modules/         # Built-in modules
-├── scripts/             # Installation & build scripts
-├── installer.sh         # Curl-installable setup script
-├── install.sh           # Local repository setup
-└── setup.py             # Python package configuration
-```
-
-## Installation Methods
-
-### Method 1: Curl (Recommended for Fresh Installs)
-```bash
-bash <(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
-```
-
-### Method 2: Wget
-```bash
-bash <(wget -qO- https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
-```
-
-### Method 3: Local Repository
-```bash
-git clone https://github.com/nekocd10/maybe-a-custom-language
-cd maybe-a-custom-language
-bash install.sh
-```
-
-### Verify Installation
-```bash
-nexus --version
-```
-
-## Examples
-
-### Variables and Types
+**Variables and Types**
 ```nexus
 let x = 42
 let name = "Nexus"
 let numbers = [1, 2, 3, 4, 5]
 ```
 
-### Functions
+**Functions**
 ```nexus
 def add(a, b) do
   return a + b
@@ -97,14 +112,14 @@ end
 let result = add(10, 20)
 ```
 
-### Loops
+**Loops**
 ```nexus
 for i in range(1, 10) do
   println i
 end
 ```
 
-### Full-Stack Web App
+**Full-Stack Web App**
 ```nexus
 use express
 
@@ -116,86 +131,246 @@ end
 app.listen 3000
 ```
 
-## Documentation
+</details>
 
-- **[Complete Guide](docs/DOCUMENTATION.md)** - Full documentation, quick start, and examples
-- **[Language Specification](docs/SPEC.md)** - Grammar, syntax rules, and type system
-- **[Full-Stack Guide](docs/FULLSTACK.md)** - Web development with Nexus
+---
 
-## Command Reference
+<details>
+<summary><b>🛠️ Installation Details & What Gets Installed</b></summary>
 
-```bash
-# Basic usage
-nexus script.nexus          # Run a Nexus script
-nexus                       # Interactive REPL
+### Installation Process
 
-# CLI Options
-nexus --version             # Show version
-nexus --help                # Show help message
-nexus --parse script.nexus  # Show AST
+The installer automatically:
+1. Detects OS (Linux, macOS, Windows, Termux)
+2. Detects architecture (32-bit, 64-bit, ARM, etc.)
+3. Verifies Python 3.8+ installation
+4. Downloads from GitHub
+5. Installs Python package
+6. **Deletes all markdown files** (saves ~20 MB)
+7. **Renames folder to `.nxs`**
+8. Creates global CLI commands
+9. Sets up shell profile
+10. Verifies everything works
+
+### Installation Location
+
+| OS | Location |
+|----|----------|
+| Linux/macOS/Termux | `~/.nxs/` |
+| Windows | `%USERPROFILE%\.nxs\` |
+
+### What Gets Installed
+
+```
+~/.nxs/
+├── src/              # Source code (~10 MB)
+├── docs/             # Documentation (~2 MB)
+├── examples/         # Examples (~1 MB)
+├── nxs_modules/      # Built-in modules (~5 MB)
+├── config/           # Configuration files
+└── setup.py
+
+Total size: 50-80 MB
+All .md files: DELETED ✓
 ```
 
-## Development
+### System Requirements
+
+- **Python**: 3.8 or higher
+- **Download tool**: curl, wget, or git
+- **OS**: Any Linux, macOS, Windows, Termux, BSD, etc.
+- **Architecture**: x86, x86_64, ARM, ARM64, or other
+
+</details>
+
+---
+
+<details>
+<summary><b>📖 Documentation & Commands</b></summary>
+
+### Project Structure
+
+```
+maybe-a-custom-language/
+├── src/                # Core interpreter
+│   ├── lexer.py
+│   ├── parser.py
+│   ├── interpreter.py
+│   ├── cli.py
+│   └── (10 more modules)
+├── docs/               # Documentation
+├── examples/           # Example programs
+├── scripts/            # Installation scripts
+├── nxs_modules/        # Built-in modules
+└── config/             # Configuration
+```
+
+### Commands
+
+```bash
+nexus script.nexus      # Run a Nexus program
+nxs script.nexus        # Alias (shorter)
+nexus --version         # Show version
+nexus --help            # Show help
+nexus --parse file.nxs  # Show AST
+```
+
+### Documentation Files
+
+Inside `~/.nxs/docs/`:
+- `DOCUMENTATION.md` - Complete reference
+- `SPEC.md` - Language specification
+- `FULLSTACK.md` - Web development guide
+
+### Built-in Modules
+
+**Express (Web Framework)**
+```nexus
+use express
+app = express.create
+app.get "/", handler
+app.listen 3000
+```
+
+**Package Manager**
+```bash
+nexus-pm search package
+nexus-pm install package
+```
+
+</details>
+
+---
+
+<details>
+<summary><b>🔧 Development & Contributing</b></summary>
 
 ### Requirements
+
 - Python 3.8+
 - Git (for cloning)
+- pip (Python package manager)
 
-### Setting up for Development
+### Setting Up for Development
+
 ```bash
 git clone https://github.com/nekocd10/maybe-a-custom-language
 cd maybe-a-custom-language
-pip install -e .[dev]
+pip install -e .
+```
+
+### Running from Source
+
+```bash
+cd ~/.nxs
+python -m src.cli script.nexus
 ```
 
 ### Running Tests
+
 ```bash
 python -m pytest
 ```
 
-## Modules
+### Contributing
 
-### Built-in Modules
-
-#### Express (Web Framework)
-```nexus
-use express
-app = express.create
-app.get "/api/data", handler
-app.listen 8080
-```
-
-#### Package Manager
-```bash
-nexus-pm search react
-nexus-pm install react
-```
-
-## Performance
-
-For optimization and compilation strategies, see the [performance guide](docs/INTERPRETER_ALTERNATIVES.md).
-
-## Contributing
-
-Contributions welcome! Please:
 1. Fork the repository
-2. Create a feature branch
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
-4. Submit a pull request
+4. Commit your work (`git commit -m 'Add amazing feature'`)
+5. Push to branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
 
-## Roadmap
+</details>
+
+---
+
+<details>
+<summary><b>❓ Troubleshooting & FAQ</b></summary>
+
+### Python not found
+
+**Linux:**
+```bash
+sudo apt install python3
+```
+
+**macOS:**
+```bash
+brew install python@3.11
+```
+
+**Termux:**
+```bash
+pkg install python
+```
+
+**Windows:**
+Download from [python.org](https://www.python.org) and check "Add Python to PATH"
+
+### Command not recognized after installation
+
+Restart your terminal or run:
+```bash
+source ~/.bashrc      # Linux/Termux
+source ~/.zshrc       # macOS with zsh
+```
+
+### Installation failed
+
+Try the wget fallback:
+```bash
+bash <(wget -qO- https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
+```
+
+Or install from local repository:
+```bash
+git clone https://github.com/nekocd10/maybe-a-custom-language
+cd maybe-a-custom-language
+bash install.sh
+```
+
+### Uninstalling
+
+```bash
+# Remove installation
+rm -rf ~/.nxs
+
+# Remove from shell profile (optional)
+nano ~/.bashrc
+# Remove lines mentioning "nxs" or "Nexus"
+```
+
+### What happens to documentation?
+
+Documentation is stored in `~/.nxs/docs/` after installation. Root `.md` files are automatically deleted to save space.
+
+</details>
+
+---
+
+<details>
+<summary><b>🎯 Roadmap & Support</b></summary>
+
+### Roadmap
 
 - [ ] Compiler backend for better performance
-- [ ] Language Server Protocol support
+- [ ] Language Server Protocol (LSP) support
 - [ ] Expanded standard library
-- [ ] Package registry
+- [ ] Official package registry
 - [ ] VS Code extension
+- [ ] IDE support for other editors
+- [ ] REPL improvements
 
-## Support
+### Support & Resources
 
-- 📖 [Documentation](docs/DOCUMENTATION.md)
 - 🐛 [Report Issues](https://github.com/nekocd10/maybe-a-custom-language/issues)
 - 💬 [Discussions](https://github.com/nekocd10/maybe-a-custom-language/discussions)
+- 📧 Email: dev@nexus-lang.dev
+
+</details>
+
+---
 
 ## License
 
