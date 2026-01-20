@@ -59,16 +59,33 @@ pkg install python curl
 bash <(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
 ```
 
-### Supported Devices
+**Method 5: Docker**
+```dockerfile
+FROM python:3.11-slim
+RUN bash -c "$(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)"
+CMD ["nexus"]
+```
 
-| Device | 32-bit | 64-bit | Termux | Status |
-|--------|--------|--------|--------|--------|
-| Linux | ✅ | ✅ | N/A | Full |
-| macOS | N/A | ✅ | N/A | Full |
-| Windows | ✅ | ✅ | N/A | Full |
-| Raspberry Pi | ✅ | ✅ | N/A | Full |
-| Android (Termux) | ✅ | ✅ | ✅ | Full |
-| ARM Devices | ✅ | ✅ | ✅ | Full |
+Or with Alpine (minimal):
+```dockerfile
+FROM python:3.11-alpine
+RUN apk add --no-cache git curl && \
+    bash -c "$(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)"
+CMD ["nexus"]
+```
+
+### Supported Devices & Linux Distros
+
+| Platform | Support | Notes |
+|----------|---------|-------|
+| **Linux (All Distros)** | ✅ | Ubuntu, Debian, Fedora, Arch, Alpine, openSUSE, etc. |
+| **macOS** | ✅ | Intel & Apple Silicon |
+| **Windows** | ✅ | 32-bit & 64-bit |
+| **Raspberry Pi** | ✅ | All models |
+| **Android (Termux)** | ✅ | ARM & x86 |
+| **Docker** | ✅ | All base images |
+| **32-bit Systems** | ✅ | x86 & ARM |
+| **64-bit Systems** | ✅ | x86_64 & ARM64 |
 
 ### Verify Installation
 ```bash

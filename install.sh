@@ -91,21 +91,96 @@ esac
 
 print_success "Architecture: $ARCH_NAME"
 
-# Check Python installation
-if ! command -v python3 &> /dev/null; then
-    if ! command -v python &> /dev/null; then
-        print_error "Python 3 is required but not installed"
-        echo "Please install Python 3.8 or higher"
-        if [ "$PLATFORM" = "termux" ]; then
-            echo "On Termux, run: pkg install python"
-        fi
-        exit 1
+# Detect Linux distribution for helpful error messages
+detect_distro() {
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        echo "$ID"
+    elif [ -f /etc/redhat-release ]; then
+        echo "rhel"
+    elif [ -f /etc/debian_version ]; then
+        echo "debian"
     else
-        PYTHON_CMD="python"
+        echo "unknown"
     fi
-else
-    PYTHON_CMD="python3"
-fi
+}
+
+# Auto-install Python if missing
+install_python_if_needed() {
+    if command -v python3 &> /dev/null; then
+        PYTHON_CMD="python3"
+        return 0
+    fi
+    
+    if command -v python &> /dev/null; then
+        PYTHON_CMD="python"
+        return 0
+    fi
+    
+    # Python is missing, try to install it
+    print_warning "Python 3 not found, attempting to install..."
+    
+    DISTRO=$(detect_distro)
+    
+    if [ "$PLATFORM" = "termux" ]; then
+        print_info "Installing Python via pkg (Termux)..."
+        pkg install -y python 2>/dev/null || {
+            print_error "Failed to install Python on Termux"
+            exit 1
+        }
+    elif [ "$DISTRO" = "alpine" ]; then
+        print_info "Installing Python via apk (Alpine)..."
+        apk add --no-cache python3 py3-pip 2>/dev/null || {
+            print_error "Failed to install Python on Alpine. Try manually: apk add --no-cache python3 py3-pip"
+            exit 1
+        }
+    elif [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "ubuntu" ]; then
+        print_info "Installing Python via apt (Debian/Ubuntu)..."
+        apt-get update 2>/dev/null && apt-get install -y python3 python3-pip 2>/dev/null || {
+            print_error "Failed to install Python on Debian/Ubuntu. Try manually: apt-get install -y python3 python3-pip"
+            exit 1
+        }
+    elif [ "$DISTRO" = "fedora" ] || [ "$DISTRO" = "rhel" ] || [ "$DISTRO" = "centos" ]; then
+        print_info "Installing Python via dnf (Fedora/RHEL/CentOS)..."
+        dnf install -y python3 python3-pip 2>/dev/null || {
+            print_error "Failed to install Python on Fedora/RHEL/CentOS. Try manually: dnf install -y python3 python3-pip"
+            exit 1
+        }
+    elif [ "$DISTRO" = "arch" ]; then
+        print_info "Installing Python via pacman (Arch)..."
+        pacman -S --noconfirm python python-pip 2>/dev/null || {
+            print_error "Failed to install Python on Arch. Try manually: pacman -S python python-pip"
+            exit 1
+        }
+    elif [ "$DISTRO" = "opensuse" ] || [ "$DISTRO" = "opensuse-leap" ]; then
+        print_info "Installing Python via zypper (openSUSE)..."
+        zypper install -y python3 python3-pip 2>/dev/null || {
+            print_error "Failed to install Python on openSUSE. Try manually: zypper install -y python3 python3-pip"
+            exit 1
+        }
+    else
+        print_error "Could not detect your Linux distribution"
+        echo "Please install Python 3.8 or higher manually and try again"
+        exit 1
+    fi
+    
+    # Verify installation worked
+    if command -v python3 &> /dev/null; then
+        PYTHON_CMD="python3"
+        print_success "Python installed successfully"
+        return 0
+    elif command -v python &> /dev/null; then
+        PYTHON_CMD="python"
+        print_success "Python installed successfully"
+        return 0
+    else
+        print_error "Python installation failed"
+        exit 1
+    fi
+}
+
+# Check Python installation
+install_python_if_needed
 
 PYTHON_VERSION=$($PYTHON_CMD --version 2>&1 | cut -d' ' -f2)
 print_success "Python version: $PYTHON_VERSION"
