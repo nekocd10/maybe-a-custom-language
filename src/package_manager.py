@@ -8,6 +8,7 @@ import os
 import sys
 import subprocess
 import shutil
+import re
 from pathlib import Path
 from typing import Dict, List, Any
 import urllib.request
@@ -45,6 +46,90 @@ class NxsPackageManager:
         with open(self.registry_file, 'w') as f:
             json.dump(self.registry, f, indent=2)
     
+    def transpile_javascript_to_nexus(self, js_code: str) -> str:
+        """Basic transpiler to convert JavaScript to Nexus syntax"""
+        # This is a very basic transpiler - in practice, this would be much more sophisticated
+        
+        # Replace function declarations
+        js_code = re.sub(r'function\s+(\w+)\s*\(([^)]*)\)\s*{', r'func \1(\2) {', js_code)
+        
+        # Replace var/let/const with var (Nexus uses var)
+        js_code = re.sub(r'\b(var|let|const)\s+', 'var ', js_code)
+        
+        # Replace console.log with print
+        js_code = re.sub(r'console\.log\s*\(', 'print(', js_code)
+        
+        # Replace === with ==
+        js_code = re.sub(r'===', '==', js_code)
+        js_code = re.sub(r'!==', '!=', js_code)
+        
+        # Replace && with and, || with or
+        js_code = re.sub(r'&&', 'and', js_code)
+        js_code = re.sub(r'\|\|', 'or', js_code)
+        
+        # Replace if statements
+        js_code = re.sub(r'}\s*else\s+if\s*\(', '} elif (', js_code)
+        js_code = re.sub(r'}\s*else\s*{', '} else {', js_code)
+        
+        # Replace for loops (basic)
+        js_code = re.sub(r'for\s*\(\s*var\s+(\w+)\s*=\s*(\d+)\s*;\s*\w+\s*<\s*([^;]+);\s*\w+\+\+\s*\)', r'for \1 in \2..\3 {', js_code)
+        
+        # Replace array literals
+        js_code = re.sub(r'\[([^\]]*)\]', r'[\1]', js_code)  # Keep arrays similar
+        
+        # Replace object literals with basic struct syntax
+        js_code = re.sub(r'{\s*([^}]*)\s*}', r'struct {\1}', js_code)
+        
+        # Replace return statements
+        js_code = re.sub(r'\breturn\s+', 'return ', js_code)
+        
+        return js_code
+    
+    def transpile_package(self, package_dir: Path):
+        """Transpile JavaScript files in a package to Nexus syntax"""
+        nxs_dir = package_dir / "nxs"
+        nxs_dir.mkdir(exist_ok=True)
+        
+        # Find all .js files
+        for js_file in package_dir.rglob("*.js"):
+            if js_file.name.startswith("_"):  # Skip internal files
+                continue
+                
+            try:
+                with open(js_file, 'r', encoding='utf-8') as f:
+                    js_content = f.read()
+                
+                # Transpile to Nexus
+                nxs_content = self.transpile_javascript_to_nexus(js_content)
+                
+                # Save as .nxs file
+                nxs_file = nxs_dir / js_file.with_suffix('.nxs').name
+                with open(nxs_file, 'w', encoding='utf-8') as f:
+                    f.write(nxs_content)
+                    
+                print(f"  ✓ Transpiled {js_file.name} → {nxs_file.name}")
+                
+            except Exception as e:
+                print(f"  ⚠️  Failed to transpile {js_file.name}: {e}")
+    
+    def install(self, package_name: str, version: str = "latest"):
+        """Install a package"""
+        print(f"Installing {package_name}@{version}...")
+        
+        # Try npm first
+        if self.try_install_npm(package_name, version):
+            return
+        
+        # Try custom registry
+        if self.try_install_custom(package_name, version):
+            return
+        
+        # Try local
+        if self.try_install_local(package_name):
+            return
+        
+        print(f"Error: Package {package_name} not found")
+    
     def install(self, package_name: str, version: str = "latest"):
         """Install a package"""
         print(f"Installing {package_name}@{version}...")
@@ -78,24 +163,65 @@ class NxsPackageManager:
                 npm_version = result.stdout.strip()
                 print(f"  Found npm package version {npm_version}")
                 
-                # Create npm package wrapper
+                # Create npm package directory
                 pkg_dir = self.packages_dir / f"{package_name}@{npm_version}"
                 pkg_dir.mkdir(parents=True, exist_ok=True)
                 
-                # Store npm reference
-                self.registry["npm_packages"][package_name] = {
-                    "version": npm_version,
-                    "type": "npm",
-                    "installed": True
-                }
-                self.save_registry()
+                # Download npm package using npm pack
+                print(f"  Downloading {package_name}@{npm_version}...")
+                pack_result = subprocess.run(
+                    ["npm", "pack", f"{package_name}@{npm_version}"],
+                    cwd=str(pkg_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=30
+                )
                 
-                # Link to project
-                self.link_package(package_name, str(pkg_dir))
-                print(f"  ✓ Installed {package_name}@{npm_version}")
-                return True
+                if pack_result.returncode == 0:
+                    # Extract the tarball
+                    tarball = pack_result.stdout.strip()
+                    tarball_path = pkg_dir / tarball
+                    
+                    if tarball_path.exists():
+                        import tarfile
+                        with tarfile.open(tarball_path, 'r:gz') as tar:
+                            # Extract to package directory, stripping the first directory level
+                            for member in tar.getmembers():
+                                if member.name.startswith('package/'):
+                                    member.name = member.name[8:]  # Remove 'package/' prefix
+                                    tar.extract(member, pkg_dir)
+                        
+                        # Clean up tarball
+                        tarball_path.unlink()
+                        
+                        print(f"  ✓ Downloaded and extracted npm package files")
+                        
+                        # Transpile JavaScript to Nexus syntax
+                        print(f"  Transpiling to Nexus syntax...")
+                        self.transpile_package(pkg_dir)
+                        
+                        # Store npm reference
+                        self.registry["npm_packages"][package_name] = {
+                            "version": npm_version,
+                            "type": "npm",
+                            "installed": True,
+                            "path": str(pkg_dir)
+                        }
+                        self.save_registry()
+                        
+                        # Link to project
+                        self.link_package(package_name, str(pkg_dir))
+                        print(f"  ✓ Installed {package_name}@{npm_version}")
+                        return True
+                    else:
+                        print(f"  ❌ Tarball not found after pack")
+                        return False
+                else:
+                    print(f"  ❌ Failed to pack package: {pack_result.stderr}")
+                    return False
         except Exception as e:
-            pass
+            print(f"  ❌ Error installing npm package: {e}")
+            return False
         
         return False
     
@@ -136,14 +262,27 @@ class NxsPackageManager:
         self.project_packages.mkdir(exist_ok=True)
         link_path = self.project_packages / name
         
-        # Create symlink or copy
-        if link_path.exists():
-            shutil.rmtree(link_path)
+        # Check if there's a transpiled nxs directory
+        pkg_path = Path(path)
+        nxs_path = pkg_path / "nxs"
+        if nxs_path.exists():
+            link_target = str(nxs_path)
+        else:
+            link_target = path
         
+        # Remove existing link if it exists
+        if link_path.exists():
+            if link_path.is_symlink():
+                link_path.unlink()  # Remove symlink
+            else:
+                shutil.rmtree(link_path)  # Remove directory
+        
+        # Create symlink
         try:
-            os.symlink(path, link_path)
+            os.symlink(link_target, link_path)
         except (OSError, NotImplementedError):
-            shutil.copytree(path, link_path)
+            # Fallback to copy if symlinks not supported
+            shutil.copytree(link_target, link_path)
         
         # Update nxs.json
         self.update_package_json(name)
