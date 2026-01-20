@@ -7,7 +7,7 @@ A simple, intuitive programming language designed for clarity and expressiveness
 Works on **all devices**: Linux, macOS, Windows, Termux, 32-bit, 64-bit, ARM, and more.
 
 ```bash
-bash <(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
+bash <(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)
 ```
 
 **What it does automatically:**
@@ -38,31 +38,31 @@ nexus hello.nexus
 
 **Method 1: Curl (Recommended)**
 ```bash
-bash <(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
+bash <(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)
 ```
 
 **Method 2: Wget**
 ```bash
-bash <(wget -qO- https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
+bash <(wget -qO- https://github.com/nekocd10/Nexus/raw/main/installer.sh)
 ```
 
 **Method 3: Local Repository**
 ```bash
-git clone https://github.com/nekocd10/maybe-a-custom-language
-cd maybe-a-custom-language
+git clone https://github.com/nekocd10/Nexus
+cd Nexus
 bash install.sh
 ```
 
 **Method 4: Termux (Mobile)**
 ```bash
 pkg install python curl
-bash <(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
+bash <(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)
 ```
 
 **Method 5: Docker**
 ```dockerfile
 FROM python:3.11-slim
-RUN bash -c "$(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)"
+RUN bash -c "$(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)"
 CMD ["nexus"]
 ```
 
@@ -70,7 +70,7 @@ Or with Alpine (minimal):
 ```dockerfile
 FROM python:3.11-alpine
 RUN apk add --no-cache git curl && \
-    bash -c "$(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)"
+    bash -c "$(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)"
 CMD ["nexus"]
 ```
 
@@ -208,7 +208,7 @@ All .md files: DELETED ✓
 ### Project Structure
 
 ```
-maybe-a-custom-language/
+Nexus/
 ├── src/                # Core interpreter
 │   ├── lexer.py
 │   ├── parser.py
@@ -271,8 +271,8 @@ nexus-pm install package
 ### Setting Up for Development
 
 ```bash
-git clone https://github.com/nekocd10/maybe-a-custom-language
-cd maybe-a-custom-language
+git clone https://github.com/nekocd10/Nexus
+cd Nexus
 pip install -e .
 ```
 
@@ -337,13 +337,13 @@ source ~/.zshrc       # macOS with zsh
 
 Try the wget fallback:
 ```bash
-bash <(wget -qO- https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
+bash <(wget -qO- https://github.com/nekocd10/Nexus/raw/main/installer.sh)
 ```
 
 Or install from local repository:
 ```bash
-git clone https://github.com/nekocd10/maybe-a-custom-language
-cd maybe-a-custom-language
+git clone https://github.com/nekocd10/Nexus
+cd Nexus
 bash install.sh
 ```
 
@@ -381,8 +381,8 @@ Documentation is stored in `~/.nxs/docs/` after installation. Root `.md` files a
 
 ### Support & Resources
 
-- 🐛 [Report Issues](https://github.com/nekocd10/maybe-a-custom-language/issues)
-- 💬 [Discussions](https://github.com/nekocd10/maybe-a-custom-language/discussions)
+- 🐛 [Report Issues](https://github.com/nekocd10/Nexus/issues)
+- 💬 [Discussions](https://github.com/nekocd10/Nexus/discussions)
 - 📧 Email: dev@nexus-lang.dev
 
 </details>

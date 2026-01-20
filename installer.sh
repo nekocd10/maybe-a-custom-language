@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Nexus Programming Language - Universal Installer
 # Works on: Linux, macOS, Windows, Termux, 32-bit, 64-bit
-# Usage: bash <(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
-# Or:    bash <(wget -qO- https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
+# Usage: bash <(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)
+# Or:    bash <(wget -qO- https://github.com/nekocd10/Nexus/raw/main/installer.sh)
 
 set -e
 
@@ -234,7 +234,7 @@ CLONE_SUCCESS=0
 
 # Try git first
 if command -v git &> /dev/null; then
-    if git clone --depth 1 https://github.com/nekocd10/maybe-a-custom-language.git nxs-temp 2>/dev/null; then
+    if git clone --depth 1 https://github.com/nekocd10/Nexus.git nxs-temp 2>/dev/null; then
         mv nxs-temp nxs-repo
         CLONE_SUCCESS=1
     fi
@@ -243,10 +243,10 @@ fi
 # Try wget if git failed
 if [ $CLONE_SUCCESS -eq 0 ] && command -v wget &> /dev/null; then
     print_info "Using wget fallback..."
-    if wget -q https://github.com/nekocd10/maybe-a-custom-language/archive/refs/heads/main.zip -O main.zip 2>/dev/null; then
+    if wget -q https://github.com/nekocd10/Nexus/archive/refs/heads/main.zip -O main.zip 2>/dev/null; then
         if command -v unzip &> /dev/null; then
             unzip -q main.zip 2>/dev/null
-            mv maybe-a-custom-language-main nxs-repo
+            mv Nexus-main nxs-repo
             CLONE_SUCCESS=1
         fi
     fi
@@ -255,10 +255,10 @@ fi
 # Try curl if both failed
 if [ $CLONE_SUCCESS -eq 0 ] && command -v curl &> /dev/null; then
     print_info "Using curl fallback..."
-    if curl -sL https://github.com/nekocd10/maybe-a-custom-language/archive/refs/heads/main.zip -o main.zip 2>/dev/null; then
+    if curl -sL https://github.com/nekocd10/Nexus/archive/refs/heads/main.zip -o main.zip 2>/dev/null; then
         if command -v unzip &> /dev/null; then
             unzip -q main.zip 2>/dev/null
-            mv maybe-a-custom-language-main nxs-repo
+            mv Nexus-main nxs-repo
             CLONE_SUCCESS=1
         fi
     fi

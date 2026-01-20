@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Nexus Programming Language - Curl-based Installer
-# Usage: bash <(curl -sL https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
-# Or:    bash <(wget -qO- https://github.com/nekocd10/maybe-a-custom-language/raw/main/installer.sh)
+# Usage: bash <(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)
+# Or:    bash <(wget -qO- https://github.com/nekocd10/Nexus/raw/main/installer.sh)
 
 set -e
 
@@ -75,16 +75,16 @@ print_info "Downloading Nexus from GitHub..."
 cd "$TEMP_DIR"
 
 if command -v git &> /dev/null; then
-    git clone --depth 1 https://github.com/nekocd10/maybe-a-custom-language.git nexus-repo 2>/dev/null || {
+    git clone --depth 1 https://github.com/nekocd10/Nexus.git nexus-repo 2>/dev/null || {
         print_error "Failed to clone repository with git, trying wget..."
         if command -v wget &> /dev/null; then
-            wget -q https://github.com/nekocd10/maybe-a-custom-language/archive/refs/heads/main.zip
+            wget -q https://github.com/nekocd10/Nexus/archive/refs/heads/main.zip
             unzip -q main.zip
-            mv maybe-a-custom-language-main nexus-repo
+            mv Nexus-main nexus-repo
         elif command -v curl &> /dev/null; then
-            curl -sL https://github.com/nekocd10/maybe-a-custom-language/archive/refs/heads/main.zip -o main.zip
+            curl -sL https://github.com/nekocd10/Nexus/archive/refs/heads/main.zip -o main.zip
             unzip -q main.zip
-            mv maybe-a-custom-language-main nexus-repo
+            mv Nexus-main nexus-repo
         else
             print_error "Neither git, wget, nor curl found. Please install one of them."
             exit 1
@@ -93,13 +93,13 @@ if command -v git &> /dev/null; then
 else
     print_info "Git not found, using wget/curl fallback..."
     if command -v wget &> /dev/null; then
-        wget -q https://github.com/nekocd10/maybe-a-custom-language/archive/refs/heads/main.zip
+        wget -q https://github.com/nekocd10/Nexus/archive/refs/heads/main.zip
         unzip -q main.zip
-        mv maybe-a-custom-language-main nexus-repo
+        mv Nexus-main nexus-repo
     elif command -v curl &> /dev/null; then
-        curl -sL https://github.com/nekocd10/maybe-a-custom-language/archive/refs/heads/main.zip -o main.zip
+        curl -sL https://github.com/nekocd10/Nexus/archive/refs/heads/main.zip -o main.zip
         unzip -q main.zip
-        mv maybe-a-custom-language-main nexus-repo
+        mv Nexus-main nexus-repo
     else
         print_error "Neither git, wget, nor curl found. Please install one of them."
         exit 1

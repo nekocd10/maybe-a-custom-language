@@ -19,26 +19,15 @@ setup(
     long_description_content_type="text/markdown",
     author="Nexus Community",
     author_email="dev@nexus-lang.dev",
-    url="https://github.com/nekocd10/maybe-a-custom-language",
+    url="https://github.com/nekocd10/Nexus",
     license="MIT",
     
-    packages=find_packages(include=["src", "nxs_modules"]),
-    py_modules=[
-        "src.cli",
-        "src.interpreter",
-        "src.lexer",
-        "src.parser",
-        "src.package_manager",
-        "src.frontend",
-        "src.backend",
-        "src.build",
-        "src.interop",
-        "src.bundler"
-    ],
+    packages=find_packages(include=["src"]),
     
     entry_points={
         "console_scripts": [
             "nexus=src.cli:main",
+            "nxs=src.cli:main",
             "nexus-pm=src.package_manager:main"
         ]
     },
