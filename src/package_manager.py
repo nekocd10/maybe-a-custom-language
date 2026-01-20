@@ -253,6 +253,33 @@ class NxsPackageManager:
         """Get nxs version"""
         return "1.0.0"
     
+    def get_package_version(self, package_name: str):
+        """Get the version of an installed package"""
+        # Check npm packages
+        if package_name in self.registry.get("npm_packages", {}):
+            return self.registry["npm_packages"][package_name]["version"]
+        
+        # Check custom packages
+        if package_name in self.registry.get("packages", {}):
+            return self.registry["packages"][package_name]["version"]
+        
+        # Check if package is installed locally
+        pkg_path = self.project_packages / package_name
+        if pkg_path.exists():
+            # Try to find version in package.json or nxs.json
+            for config_file in ["package.json", "nxs.json"]:
+                config_path = pkg_path / config_file
+                if config_path.exists():
+                    try:
+                        with open(config_path, 'r') as f:
+                            data = json.load(f)
+                            if "version" in data:
+                                return data["version"]
+                    except:
+                        pass
+        
+        return None
+    
     def run_script(self, script_name: str):
         """Run a script defined in nxs.json"""
         if not self.project_package_json.exists():

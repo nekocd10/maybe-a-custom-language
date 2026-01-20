@@ -182,7 +182,7 @@ def main():
     if len(sys.argv) < 2:
         print("Nexus Build System")
         print()
-        print("Usage: nexus build <command>")
+        print("Usage: nxs build <command>")
         print()
         print("Commands:")
         print("  build              Build the project")

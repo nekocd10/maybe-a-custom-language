@@ -151,13 +151,14 @@ class NexusCLI:
             print("  remove <pkg>    # Remove package")
             print("  search <query>  # Search packages")
             print("  list            # List installed packages")
+            print("  package <pkg> version  # Show package version")
             print("  publish         # Publish package")
             return
         
         command = args[0]
         
         try:
-            from nxs_pm import NxsPackageManager
+            from src.package_manager import NxsPackageManager
             pm = NxsPackageManager()
             
             if command == "install" and len(args) > 1:
@@ -178,6 +179,14 @@ class NexusCLI:
             
             elif command == "publish":
                 pm.publish()
+            
+            elif command == "package" and len(args) >= 3 and args[2] == "version":
+                package_name = args[1]
+                version = pm.get_package_version(package_name)
+                if version:
+                    print(f"{package_name}@{version}")
+                else:
+                    print(f"Package '{package_name}' not found or version unknown")
             
             else:
                 print(f"Unknown nxs command: {command}")
