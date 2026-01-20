@@ -249,14 +249,48 @@ print_success "Removed markdown files"
 
 # Install Python package to system/user Python environment
 print_info "Installing Nexus package..."
-$PYTHON_CMD -m pip install -q -e . 2>/dev/null || {
-    print_warning "Trying with --user flag..."
-    $PYTHON_CMD -m pip install -q --user -e . 2>/dev/null || {
-        print_error "Failed to install package"
+
+# Verify pip is available
+if ! $PYTHON_CMD -m pip --version &> /dev/null; then
+    print_warning "pip not found, attempting to install it..."
+    if command -v apt-get &> /dev/null; then
+        apt-get install -y python3-pip 2>/dev/null || true
+    elif command -v dnf &> /dev/null; then
+        dnf install -y python3-pip 2>/dev/null || true
+    elif command -v pacman &> /dev/null; then
+        pacman -S --noconfirm python-pip 2>/dev/null || true
+    elif command -v apk &> /dev/null; then
+        apk add --no-cache py3-pip 2>/dev/null || true
+    elif command -v zypper &> /dev/null; then
+        zypper install -y python3-pip 2>/dev/null || true
+    fi
+    
+    if ! $PYTHON_CMD -m pip --version &> /dev/null; then
+        print_error "pip is not available. Try installing it manually first."
         exit 1
-    }
-}
-print_success "Package installed to Python environment"
+    fi
+fi
+
+# Try standard installation
+if $PYTHON_CMD -m pip install -e . 2>&1 | grep -q "Successfully installed"; then
+    print_success "Package installed to Python environment"
+else
+    # Try with --user flag
+    print_info "Retrying with --user flag..."
+    if $PYTHON_CMD -m pip install --user -e . 2>&1 | grep -q "Successfully installed"; then
+        print_success "Package installed to Python environment (--user)"
+    else
+        # Try without editable mode
+        print_info "Retrying without editable mode..."
+        if $PYTHON_CMD -m pip install --user . 2>&1 | grep -q "Successfully installed"; then
+            print_success "Package installed to Python environment"
+        else
+            print_error "Failed to install package with pip. Try manually:"
+            echo "  $PYTHON_CMD -m pip install --user ."
+            exit 1
+        fi
+    fi
+fi
 
 # Verify installation
 
