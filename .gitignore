@@ -53,6 +53,7 @@ htmlcov/
 build_output/
 dist_output/
 .nxs/
+nxs_modules/
 
 # Installation artifacts
 .install.done

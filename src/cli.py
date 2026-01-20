@@ -18,7 +18,8 @@ class NexusCLI:
         self.version = "1.0.0"
         self.commands = {
             "new": "Create a new Nexus project",
-            "nxs": "Package manager commands",
+            "install": "Install Nexus package",
+            "nxs": "NPM package manager commands",
             "run": "Run a Nexus file",
             "build": "Build the project",
             "dev": "Start development server",
@@ -39,6 +40,8 @@ class NexusCLI:
         
         if command == "new":
             self.cmd_new(args)
+        elif command == "install":
+            self.cmd_install(args)
         elif command == "nxs":
             self.cmd_nxs(args)
         elif command == "run":
@@ -75,7 +78,8 @@ class NexusCLI:
         print()
         print("EXAMPLES:")
         print("  nexus new myapp              # Create new project")
-        print("  nexus nxs install react      # Install package")
+        print("  nexus install mylib          # Install Nexus package")
+        print("  nexus nxs install react      # Install NPM package")
         print("  nexus run script.nexus       # Run Nexus file")
         print("  nexus build                  # Build project")
         print("  nexus dev                    # Start dev server")
@@ -137,17 +141,43 @@ class NexusCLI:
         print("✅ Project created successfully!")
         print()
         print(f"  cd {project_name}")
-        print("  nexus nxs install              # Install dependencies")
+        print("  nexus install <nexus-pkg>      # Install Nexus packages")
+        print("  nexus nxs install <npm-pkg>    # Install NPM packages")
         print("  nexus dev                      # Start dev server")
         print()
     
+    def cmd_install(self, args: list):
+        """Install Nexus package"""
+        if not args:
+            print("Usage: nexus install <package> [version]")
+            sys.exit(1)
+        
+        package_name = args[0]
+        version = args[1] if len(args) > 1 else "latest"
+        
+        try:
+            from src.package_manager import NxsPackageManager
+            pm = NxsPackageManager()
+            
+            # Try custom registry first, then local
+            if pm.try_install_custom(package_name, version):
+                return
+            if pm.try_install_local(package_name):
+                return
+            
+            print(f"❌ Nexus package '{package_name}' not found")
+        
+        except ImportError:
+            print("❌ Package manager not available")
+            sys.exit(1)
+    
     def cmd_nxs(self, args: list):
-        """Package manager commands"""
+        """NPM package manager commands"""
         if not args:
             print("Usage: nexus nxs <command> [package]")
             print()
             print("Commands:")
-            print("  install <pkg>   # Install package")
+            print("  install <pkg>   # Install NPM package")
             print("  remove <pkg>    # Remove package")
             print("  search <query>  # Search packages")
             print("  list            # List installed packages")
@@ -164,7 +194,8 @@ class NexusCLI:
             if command == "install" and len(args) > 1:
                 package = args[1]
                 version = args[2] if len(args) > 2 else "latest"
-                pm.install(package, version)
+                if not pm.try_install_npm(package, version):
+                    print(f"❌ NPM package '{package}' not found")
             
             elif command == "remove" and len(args) > 1:
                 package = args[1]
