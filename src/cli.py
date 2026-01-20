@@ -294,6 +294,32 @@ class NexusCLI:
         try:
             from src.build import NexusBuilder, NexusBuildConfig, NexusDevServer
             config = NexusBuildConfig(config_file)
+            
+            # Check if main backend file is set, if not ask user
+            if "main_backend" not in config.config:
+                print("\n🔧 First time setup: Select your main backend file (.nxsjs)")
+                print("\nAvailable .nxsjs files in src/:")
+                
+                nxsjs_files = list(Path("src").rglob("*.nxsjs"))
+                if not nxsjs_files:
+                    print("  ⚠️  No .nxsjs files found in src/")
+                    print("  Create a backend file first: src/api.nxsjs")
+                else:
+                    for i, file in enumerate(nxsjs_files, 1):
+                        print(f"  {i}. {file}")
+                
+                while True:
+                    main_backend = input("\nEnter the complete file name (e.g., src/api.nxsjs): ").strip()
+                    if Path(main_backend).exists() and main_backend.endswith('.nxsjs'):
+                        config.config["main_backend"] = main_backend
+                        config.save_config()
+                        print(f"✅ Main backend set to: {main_backend}")
+                        break
+                    else:
+                        print("❌ File not found or not a .nxsjs file. Try again.")
+            else:
+                print(f"📌 Using main backend: {config.config['main_backend']}")
+            
             builder = NexusBuilder(config)
             builder.build()
             

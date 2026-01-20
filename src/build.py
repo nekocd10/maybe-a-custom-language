@@ -69,7 +69,7 @@ class NexusBuilder:
         print("✅ Build complete!")
     
     def build_frontend(self):
-        """Compile .nxs frontend files"""
+        """Compile .nxs frontend files to JavaScript, output as .nxs file"""
         print("  📦 Compiling frontend...")
         
         entry = self.config.config.get("entry", {}).get("frontend")
@@ -80,13 +80,15 @@ class NexusBuilder:
         try:
             from src.frontend import NxsCompiler
             compiler = NxsCompiler(entry)
-            output = self.config.config.get("output", {}).get("frontend", "dist/index.html")
+            # Output as .nxs file with JavaScript content inside
+            output = self.config.config.get("output", {}).get("frontend", "dist/index.nxs")
             compiler.write_output(output)
+            print(f"    ✓ Compiled {entry} -> {output}")
         except Exception as e:
             print(f"    ❌ Frontend build failed: {e}")
     
     def build_backend(self):
-        """Compile .nxsjs backend files"""
+        """Compile .nxsjs backend files (pure Nexus, not JavaScript)"""
         print("  🔧 Compiling backend...")
         
         entry = self.config.config.get("entry", {}).get("backend")
@@ -97,11 +99,11 @@ class NexusBuilder:
         try:
             from src.backend import NxsjsCompiler
             compiler = NxsjsCompiler(entry)
-            python_code = compiler.compile()
-            output = self.config.config.get("output", {}).get("backend", "dist/app.py")
+            nexus_code = compiler.compile()
+            output = self.config.config.get("output", {}).get("backend", "dist/app.nxsjs")
             Path(output).parent.mkdir(parents=True, exist_ok=True)
             with open(output, 'w') as f:
-                f.write(python_code)
+                f.write(nexus_code)
             print(f"    ✓ Compiled {entry} -> {output}")
         except Exception as e:
             print(f"    ❌ Backend build failed: {e}")
@@ -120,22 +122,76 @@ class NexusDevServer:
         self.watch_dirs = ["src"]
     
     def start(self, port: int = 5000):
-        """Start development server"""
+        """Start development server with .nxs/.nxsjs file interpretation"""
         print(f"🚀 Starting dev server on port {port}...")
         
         try:
             from http.server import HTTPServer, SimpleHTTPRequestHandler
+            from src.interpreter import NexusInterpreter
+            from src.backend import NxsjsInterpreter
+            import json
             import threading
             
             os.chdir("dist")
             
-            class Handler(SimpleHTTPRequestHandler):
+            class NexusHandler(SimpleHTTPRequestHandler):
+                def do_GET(self):
+                    # Handle .nxs files (frontend)
+                    if self.path.endswith('.nxs'):
+                        try:
+                            nxs_file = self.path.lstrip('/')
+                            if Path(nxs_file).exists():
+                                with open(nxs_file, 'r') as f:
+                                    content = f.read()
+                                
+                                # Interpret .nxs file to get HTML/JS
+                                from src.lexer import NexusLexer
+                                from src.parser import NexusParser
+                                
+                                lexer = NexusLexer(content)
+                                tokens = lexer.tokenize()
+                                parser = NexusParser(tokens)
+                                ast = parser.parse()
+                                interpreter = NexusInterpreter()
+                                result = interpreter.interpret(ast)
+                                
+                                self.send_response(200)
+                                self.send_header("Content-type", "text/html")
+                                self.end_headers()
+                                self.wfile.write(str(result).encode())
+                                return
+                        except Exception as e:
+                            print(f"Error interpreting .nxs: {e}")
+                    
+                    # Handle .nxsjs files (backend)
+                    elif self.path.endswith('.nxsjs'):
+                        try:
+                            nxsjs_file = self.path.lstrip('/')
+                            if Path(nxsjs_file).exists():
+                                with open(nxsjs_file, 'r') as f:
+                                    content = f.read()
+                                
+                                interpreter = NxsjsInterpreter()
+                                result = interpreter.interpret(content)
+                                
+                                self.send_response(200)
+                                self.send_header("Content-type", "application/json")
+                                self.end_headers()
+                                self.wfile.write(json.dumps(result).encode())
+                                return
+                        except Exception as e:
+                            print(f"Error interpreting .nxsjs: {e}")
+                    
+                    # Default handling for other files
+                    super().do_GET()
+                
                 def end_headers(self):
                     self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
                     super().end_headers()
             
-            server = HTTPServer(('localhost', port), Handler)
+            server = HTTPServer(('localhost', port), NexusHandler)
             print(f"  📍 http://localhost:{port}")
+            print(f"  ⚡ Interpreting .nxs and .nxsjs files on request")
             server.serve_forever()
         
         except Exception as e:
