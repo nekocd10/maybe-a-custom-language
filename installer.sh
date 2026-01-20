@@ -113,15 +113,6 @@ fi
 PYTHON_VERSION=$($PYTHON_CMD --version 2>&1 | cut -d' ' -f2)
 print_success "Python version: $PYTHON_VERSION"
 
-# Determine installation directory
-if [ "$PLATFORM" = "termux" ]; then
-    INSTALL_DIR="$HOME/.nxs"
-    print_info "Termux detected - installing to $INSTALL_DIR"
-else
-    INSTALL_DIR="$HOME/.nxs"
-    print_info "Installation directory: $INSTALL_DIR"
-fi
-
 # Create temporary directory for download
 TEMP_DIR=$(mktemp -d)
 trap "rm -rf $TEMP_DIR" EXIT
@@ -181,7 +172,7 @@ find . -maxdepth 1 -name "*.md" -type f -delete 2>/dev/null || true
 rm -f SHOWCASE.md pormt-for-later.txt 2>/dev/null || true
 print_success "Removed markdown files"
 
-# Install Python package
+# Install Python package to system/user Python environment
 print_info "Installing Nexus package..."
 $PYTHON_CMD -m pip install -q -e . 2>/dev/null || {
     print_warning "Trying with --user flag..."
@@ -190,56 +181,10 @@ $PYTHON_CMD -m pip install -q -e . 2>/dev/null || {
         exit 1
     }
 }
-print_success "Package installed"
-
-# Rename folder from maybe-a-custom-language to Nexus (nxs)
-print_info "Setting up Nexus (nxs) installation folder..."
-if [ -d "$INSTALL_DIR" ]; then
-    rm -rf "$INSTALL_DIR" 2>/dev/null || true
-fi
-mkdir -p "$(dirname "$INSTALL_DIR")"
-cp -r "$TEMP_DIR/nxs-repo" "$INSTALL_DIR" 2>/dev/null || true
-print_success "Nexus installed to $INSTALL_DIR"
-
-# Setup aliases and paths for easy access
-print_info "Configuring CLI access..."
-
-# Determine shell profile
-SHELL_PROFILE=""
-if [ -n "$BASH_VERSION" ]; then
-    SHELL_PROFILE="$HOME/.bashrc"
-elif [ -n "$ZSH_VERSION" ]; then
-    SHELL_PROFILE="$HOME/.zshrc"
-elif [ "$PLATFORM" = "termux" ]; then
-    SHELL_PROFILE="$HOME/.bashrc"
-else
-    SHELL_PROFILE="$HOME/.bashrc"
-fi
-
-# Add to PATH if not already there
-if ! grep -q "nxs" "$SHELL_PROFILE" 2>/dev/null; then
-    echo "" >> "$SHELL_PROFILE"
-    echo "# Nexus (nxs) CLI" >> "$SHELL_PROFILE"
-    echo "export PATH=\"\$PATH:$INSTALL_DIR\"" >> "$SHELL_PROFILE"
-    echo "alias nxs='nexus'" >> "$SHELL_PROFILE"
-fi
-
-print_success "CLI configured"
+print_success "Package installed to Python environment"
 
 # Verify installation
-print_info "Verifying installation..."
-export PATH="$PATH:$INSTALL_DIR"
 
-if nexus --version &> /dev/null; then
-    print_success "Nexus CLI is available"
-    nexus --version
-else
-    print_warning "Nexus CLI not immediately available"
-    echo "Please restart your terminal or run:"
-    echo "source $SHELL_PROFILE"
-fi
-
-# Print completion message
 echo ""
 echo -e "${GREEN}╔═════════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║     Installation Complete! 🎉               ║${NC}"
@@ -248,7 +193,7 @@ echo ""
 echo "Nexus is now installed!"
 echo ""
 echo "Quick start:"
-echo "  1. Restart terminal or run: source $SHELL_PROFILE"
+echo "  1. Try a command: nexus --version"
 echo "  2. Create a program: echo 'println \"Hello!\"' > hello.nexus"
 echo "  3. Run it: nexus hello.nexus"
 echo ""
@@ -257,7 +202,6 @@ echo "  nexus script.nexus      # Run a Nexus program"
 echo "  nexus --help            # Show help"
 echo "  nxs script.nexus        # Alias for nexus"
 echo ""
-echo "Installation folder: $INSTALL_DIR"
 echo "Supported platforms: Linux, macOS, Windows, Termux (32-bit, 64-bit)"
 echo ""
 print_success "Enjoy Nexus (nxs)!"
