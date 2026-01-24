@@ -99,7 +99,7 @@ class DecoratorType(Enum):
     BENCHMARK = "benchmark"
     ASSERT = "assert"
     
-    # Amazon/AWS Scale Infrastructure
+    # Massive Scale Infrastructure (Fully Implementable)
     REPLICATE = "replicate"
     FAILOVER = "failover"
     CONSISTENCY = "consistency"
@@ -111,9 +111,14 @@ class DecoratorType(Enum):
     MONITOR = "monitor"
     ALERT = "alert"
     CAPACITY = "capacity"
-    BILLING = "billing"
-    DDOSPROTECTION = "ddosprotection"
-    COMPLIANCE = "compliance"
+    QUOTA = "quota"
+    METERING = "metering"
+    THROTTLE = "throttle"
+    DISTRIBUTE = "distribute"
+    BACKUP = "backup"
+    DATASTORE = "datastore"
+    SECURITY = "security"
+    SYNC = "sync"
     
     # Deployment & Infrastructure
     DEPLOY = "deploy"
@@ -447,35 +452,84 @@ class AutoScalingConfig:
 
 
 @dataclass
-class BillingConfig:
-    """@billing - Billing system"""
-    pricing_model: str = "pay-per-use"  # pay-per-use, fixed, tiered
-    billing_cycle: str = "monthly"
-    currency: str = "USD"
-    components: Dict[str, float] = field(default_factory=dict)  # component -> rate
-    discount_tiers: List[Dict] = field(default_factory=list)
+class QuotaConfig:
+    """@quota - Usage-based rate limiting per user/team"""
+    resource: str  # api_calls, storage, bandwidth
+    limit: int
+    time_window: int  # seconds
+    enforcement: str = "soft"  # soft (warn), hard (block)
+    per_entity: str = "user"  # user, team, org
 
 
 @dataclass
-class DDoSProtection:
-    """@ddosprotection - DDoS protection"""
-    enabled: bool = True
-    detection_mode: str = "adaptive"  # adaptive, signature-based, behavioral
-    rate_limit_per_ip: int = 10000  # requests per minute
-    block_duration: int = 300  # seconds
-    allow_list: List[str] = field(default_factory=list)
-    deny_list: List[str] = field(default_factory=list)
+class MeteringConfig:
+    """@metering - Track API usage and resource consumption"""
+    metrics: List[str] = field(default_factory=list)  # api_calls, data_processed, storage_used
+    sampling_rate: float = 1.0  # 0-1, percentage
+    granularity: str = "minute"  # minute, hour, day
+    aggregation_enabled: bool = True
+    export_format: str = "json"  # json, csv, parquet
 
 
 @dataclass
-class ComplianceConfig:
-    """@compliance - Regulatory compliance"""
-    frameworks: List[str] = field(default_factory=list)  # GDPR, HIPAA, PCI-DSS, etc.
-    data_retention_policy: str = "7-years"
+class ThrottleConfig:
+    """@throttle - Bandwidth and request throttling"""
+    max_bandwidth_mbps: int = 1000
+    max_requests_per_second: int = 10000
+    burst_size: int = 50000  # max requests in burst
+    algorithm: str = "token-bucket"
+
+
+@dataclass
+class DistributeConfig:
+    """@distribute - Content distribution and caching"""
+    distribution_points: List[str] = field(default_factory=list)  # regions/cities
+    cache_strategy: str = "cache-first"  # cache-first, network-first
+    ttl_seconds: int = 3600
+    compression_enabled: bool = True
+    cdn_enabled: bool = True
+
+
+@dataclass
+class BackupConfig:
+    """@backup - Automated backups and snapshots"""
+    schedule: str = "0 2 * * *"  # daily at 2 AM
+    retention_days: int = 30
+    backup_type: str = "incremental"  # incremental, full, differential
+    locations: List[str] = field(default_factory=list)  # backup regions
+    verify_integrity: bool = True
+
+
+@dataclass
+class DatastoreConfig:
+    """@datastore - Data storage and optimization"""
+    storage_type: str = "distributed"  # distributed, replicated, tiered
+    compression: str = "snappy"  # snappy, gzip, lz4
+    encoding: str = "utf-8"
+    cold_storage_after_days: int = 90
+    max_object_size_mb: int = 5120
+    indexing_strategy: str = "adaptive"
+
+
+@dataclass
+class SecurityConfig:
+    """@security - Built-in security rules"""
     encryption_at_rest: bool = True
     encryption_in_transit: bool = True
+    key_rotation_days: int = 90
     audit_logging: bool = True
-    right_to_be_forgotten: bool = True
+    rate_limit_suspicious: bool = True
+    suspicious_threshold: int = 100  # requests/minute
+
+
+@dataclass
+class SyncConfig:
+    """@sync - Cross-region synchronization"""
+    sync_strategy: str = "eventual"  # eventual, causal, strong
+    sync_interval_ms: int = 1000
+    conflict_resolution: str = "last-write-wins"  # last-write-wins, first-write-wins, merge
+    bidirectional: bool = True
+    retries_on_failure: int = 3
 
 
 # Global backend registry instance
