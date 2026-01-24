@@ -347,11 +347,27 @@ else
     if [ -f "$PYTHON_BIN/nexus" ]; then
         print_info "But it's installed at: $PYTHON_BIN/nexus"
         echo ""
-        echo "Add this to your shell profile (~/.bashrc, ~/.zshrc, etc):"
-        echo "  export PATH=\"\$PATH:$PYTHON_BIN\""
-        echo ""
-        echo "Then restart terminal or run:"
-        echo "  source ~/.bashrc"
+        # Prefer prepending the user's Python bin so it takes precedence
+        ADD_CMD="export PATH=\"$PYTHON_BIN:\\$PATH\""
+
+        # Detect user's login shell; on macOS the default shell is zsh
+        USER_SHELL=$(basename "${SHELL:-}")
+        if [ "$USER_SHELL" = "zsh" ] || [ "$PLATFORM" = "macos" ] && [ -n "$ZSH_VERSION" ] 2>/dev/null; then
+            PROFILE_FILE="$HOME/.zprofile"
+            # Add to ~/.zprofile idempotently
+            if [ -f "$PROFILE_FILE" ]; then
+                grep -qxF "$ADD_CMD" "$PROFILE_FILE" 2>/dev/null || echo "$ADD_CMD" >> "$PROFILE_FILE"
+            else
+                echo "$ADD_CMD" >> "$PROFILE_FILE"
+            fi
+            echo "Added PATH update to $PROFILE_FILE (for zsh)."
+            echo "Open a new terminal or run: source $PROFILE_FILE"
+        else
+            echo "Add this to your shell profile (~/.bashrc, ~/.zshrc, etc):"
+            echo "  $ADD_CMD"
+            echo ""
+            echo "Then restart terminal or run: source ~/.bashrc (or appropriate shell profile)"
+        fi
     fi
 fi
 
