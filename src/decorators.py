@@ -120,6 +120,16 @@ class DecoratorType(Enum):
     SECURITY = "security"
     SYNC = "sync"
     
+    # Compute-Heavy Workloads (NEW)
+    GPU = "gpu"
+    COMPUTE = "compute"
+    TENSOR = "tensor"
+    ML = "ml"
+    ENCODE = "encode"
+    RENDER = "render"
+    SCIENTIFIC = "scientific"
+    DISTRIBUTE_COMPUTE = "distribute_compute"
+    
     # Deployment & Infrastructure
     DEPLOY = "deploy"
     REGION = "region"
@@ -530,6 +540,134 @@ class SyncConfig:
     conflict_resolution: str = "last-write-wins"  # last-write-wins, first-write-wins, merge
     bidirectional: bool = True
     retries_on_failure: int = 3
+
+
+@dataclass
+class GPUConfig:
+    """@gpu - GPU resource allocation and optimization"""
+    device_type: str = "cuda"  # cuda, opencl, metal, vulkan
+    memory_gb: int = 16
+    compute_capability: str = "7.0"  # GPU compute capability
+    batch_size: int = 32
+    precision: str = "float32"  # float32, float16, int8
+    num_gpus: int = 1
+    distributed_training: bool = False
+
+
+@dataclass
+class ComputeConfig:
+    """@compute - CPU/GPU compute resource allocation"""
+    resource_type: str = "gpu"  # gpu, cpu, tpu, npu
+    cpu_cores: int = 16
+    memory_gb: int = 32
+    priority: str = "normal"  # high, normal, low
+    timeout_minutes: int = 60
+    auto_scale: bool = True
+    max_instances: int = 100
+
+
+@dataclass
+class TensorConfig:
+    """@tensor - Tensor operations and optimization"""
+    framework: str = "numpy"  # numpy, tensorflow, pytorch
+    dtype: str = "float32"
+    device: str = "gpu"  # gpu, cpu
+    optimization: str = "auto"  # auto, eager, graph
+    vectorization_enabled: bool = True
+    parallel_operations: int = 8
+
+
+@dataclass
+class MLConfig:
+    """@ml - Machine learning training and inference"""
+    model_type: str = "transformer"  # transformer, cnn, rnn, gru
+    framework: str = "pytorch"  # pytorch, tensorflow, jax
+    training_mode: str = "supervised"  # supervised, unsupervised, reinforcement
+    batch_size: int = 32
+    learning_rate: float = 0.001
+    epochs: int = 100
+    validation_split: float = 0.2
+    use_gpu: bool = True
+    distributed: bool = True
+    checkpoint_enabled: bool = True
+    checkpoint_interval: int = 10
+
+
+@dataclass
+class EncodeConfig:
+    """@encode - Video/audio encoding optimization"""
+    codec: str = "h265"  # h264, h265, av1, vp9
+    bitrate: str = "5000k"
+    resolution: str = "1080p"  # 480p, 720p, 1080p, 4k
+    fps: int = 30
+    audio_codec: str = "aac"
+    audio_bitrate: str = "128k"
+    parallel_jobs: int = 8
+    gpu_accelerated: bool = True
+    quality_preset: str = "high"  # fast, medium, high
+
+
+@dataclass
+class RenderConfig:
+    """@render - Graphics rendering optimization"""
+    render_engine: str = "vulkan"  # vulkan, directx, metal, opengl
+    resolution: str = "1080p"
+    target_fps: int = 60
+    ray_tracing: bool = True
+    path_tracing: bool = False
+    texture_filtering: str = "anisotropic"
+    shadow_quality: str = "high"
+    anti_aliasing: str = "dlss"  # dlss, fxaa, taa
+    gpu_required: bool = True
+
+
+@dataclass
+class ScientificConfig:
+    """@scientific - Scientific computing and numerical analysis"""
+    libraries: List[str] = field(default_factory=list)  # numpy, scipy, sympy, pandas
+    precision: str = "float64"  # float32, float64
+    algorithm: str = "auto"  # auto, iterative, direct, approximate
+    parallelization: str = "openmp"  # openmp, cuda, mpi
+    num_threads: int = 16
+    optimization_level: int = 3
+    numerical_stability: bool = True
+
+
+@dataclass
+class BenchmarkConfig:
+    """@benchmark - Performance benchmarking"""
+    enabled: bool = True
+    warmup_iterations: int = 10
+    test_iterations: int = 100
+    profile: bool = True
+    memory_tracking: bool = True
+    cpu_tracking: bool = True
+    gpu_tracking: bool = True
+    compare_baselines: bool = True
+
+
+@dataclass
+class OptimizeConfig:
+    """@optimize - Algorithm and performance optimization"""
+    optimization_target: str = "latency"  # latency, throughput, energy
+    auto_tune: bool = True
+    cache_optimization: bool = True
+    vectorization: bool = True
+    loop_unrolling: bool = True
+    branch_prediction: bool = True
+    simd_enabled: bool = True
+    jit_compilation: bool = True
+
+
+@dataclass
+class DistributeComputeConfig:
+    """@distribute_compute - Distributed computing across nodes"""
+    framework: str = "mpi"  # mpi, spark, dask, ray
+    num_nodes: int = 10
+    communication_backend: str = "nccl"  # nccl, gloo, mpi
+    fault_tolerance: bool = True
+    load_balancing: str = "automatic"  # automatic, manual, dynamic
+    network_optimization: bool = True
 
 
 # Global backend registry instance
