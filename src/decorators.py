@@ -48,6 +48,10 @@ class DecoratorType(Enum):
     CONTRACT = "contract"
     SANITIZE = "sanitize"
     
+    # Middleware & Handlers
+    MIDDLEWARE = "middleware"
+    HANDLER = "handler"
+    
     # Observability
     LOG = "log"
     TRACE = "trace"
