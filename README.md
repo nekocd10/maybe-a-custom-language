@@ -45,6 +45,85 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "& { iwr https://raw.gith
 
 ---
 
+**Installation Commands (Detailed)**
+
+If you prefer explicit package-manager commands instead of the one-liners above, use the commands for your platform below.
+
+- Linux (Debian/Ubuntu):
+```bash
+sudo apt update
+sudo apt install -y python3 python3-pip curl git
+bash <(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)
+```
+
+- Linux (Fedora/RHEL):
+```bash
+sudo dnf install -y python3 python3-pip curl git
+bash <(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)
+```
+
+- Linux (Arch):
+```bash
+sudo pacman -Syu --noconfirm python python-pip git curl
+bash <(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)
+```
+
+- Alpine:
+```bash
+sudo apk add --no-cache python3 py3-pip curl unzip
+bash <(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)
+```
+
+- macOS (Homebrew):
+```bash
+brew install python git curl
+/bin/bash -c "$(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)"
+```
+
+- Windows (PowerShell, native):
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { iwr https://raw.githubusercontent.com/nekocd10/Nexus/main/installer.ps1 -OutFile $env:TEMP\nexus_installer.ps1; & $env:TEMP\nexus_installer.ps1 }"
+```
+
+- Windows (WSL):
+```bash
+wsl bash -c "bash <(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)"
+```
+
+- Termux (Android):
+```bash
+pkg update && pkg install -y python curl git
+bash <(curl -sL https://github.com/nekocd10/Nexus/raw/main/installer.sh)
+```
+
+Notes:
+- If `nexus` is not immediately available after install, add your Python user Scripts directory to PATH. For example:
+```bash
+# Linux / macOS (zsh/bash)
+export PATH="$HOME/.local/bin:$PATH"
+
+# Windows (PowerShell)
+setx PATH "$env:PATH;$(python -m site --user-base)\Scripts"
+```
+
+**Documentation Index (summaries)**
+
+The `docs/` folder contains full guides. Below are short summaries and links — open the linked files for full content.
+
+- Backend System: Overview of `.nxsjs` backend decorators, routes, models and examples. See [docs/BACKEND_SYSTEM.md](docs/BACKEND_SYSTEM.md).
+- Getting Started: Quick install and first programs (Hello World, REPL, examples). See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
+- Quick Examples: Full example projects (Todo app, full-stack examples). See [docs/QUICK_EXAMPLES.md](docs/QUICK_EXAMPLES.md).
+- Specification: Language philosophy and core syntax (contexts, pools, flow arrows). See [docs/SPEC.md](docs/SPEC.md).
+- Full-Stack Guide: Building and deploying full-stack Nexus apps. See [docs/FULLSTACK.md](docs/FULLSTACK.md).
+- Ecosystem: Overview of package manager, modules, build system and interoperability. See [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md).
+- Implementation: Deep architecture and component descriptions for the interpreter and tooling. See [docs/IMPLEMENTATION.md](docs/IMPLEMENTATION.md).
+- Implementation Summary: Short technical summary and file inventory. See [docs/IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md).
+- Interpreter Alternatives: Notes on potential alternative runtime implementations (Go, Rust, etc.). See [docs/INTERPRETER_ALTERNATIVES.md](docs/INTERPRETER_ALTERNATIVES.md).
+- Index: Master index linking all documentation. See [docs/INDEX.md](docs/INDEX.md).
+- Complete Documentation: Aggregated table of contents and full doc index. See [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md).
+
+If you'd like, I can inline any of the above files directly into `README.md` (making it a single-file reference), or remove selected files from `docs/` if you prefer a slimmed-down repository. Tell me which files you'd like inlined or removed.
+
 ## Quick Start
 
 ```bash
