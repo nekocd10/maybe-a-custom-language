@@ -99,6 +99,22 @@ class DecoratorType(Enum):
     BENCHMARK = "benchmark"
     ASSERT = "assert"
     
+    # Amazon/AWS Scale Infrastructure
+    REPLICATE = "replicate"
+    FAILOVER = "failover"
+    CONSISTENCY = "consistency"
+    GEODISTRIBUTE = "geodistribute"
+    EDGE = "edge"
+    APIGATEWAY = "apigateway"
+    MESH = "mesh"
+    PARTITION = "partition"
+    MONITOR = "monitor"
+    ALERT = "alert"
+    CAPACITY = "capacity"
+    BILLING = "billing"
+    DDOSPROTECTION = "ddosprotection"
+    COMPLIANCE = "compliance"
+    
     # Deployment & Infrastructure
     DEPLOY = "deploy"
     REGION = "region"
@@ -298,6 +314,168 @@ class BackendRegistry:
     
     def __repr__(self):
         return f"BackendRegistry(routes={len(self.routes)}, models={len(self.models)}, middleware={len(self.middleware)})"
+
+
+@dataclass
+class DataReplication:
+    """@replicate - Data replication across regions"""
+    target_regions: List[str] = field(default_factory=list)
+    replication_factor: int = 3
+    consistency_level: str = "eventual"  # eventual, strong, causal
+    conflict_resolution: str = "last-write-wins"  # last-write-wins, custom-merge
+    
+    def __post_init__(self):
+        if self.replication_factor < 2:
+            raise ValueError("Replication factor must be >= 2")
+
+
+@dataclass
+class FailoverConfig:
+    """@failover - Automatic failover & recovery"""
+    primary_region: str
+    backup_regions: List[str] = field(default_factory=list)
+    detection_timeout: int = 5  # seconds
+    failover_strategy: str = "automatic"  # automatic, manual, semi-automatic
+    recovery_mode: str = "heal"  # heal, restore, rebuild
+    health_check_interval: int = 10  # seconds
+
+
+@dataclass
+class PartitionStrategy:
+    """@partition - Data partitioning strategy"""
+    partition_key: str
+    partition_type: str = "hash"  # hash, range, directory
+    num_partitions: int = 256
+    rebalance_strategy: str = "consistent-hashing"  # consistent-hashing, ketama
+    migration_threshold: int = 70  # rebalance when > 70% full
+
+
+@dataclass
+class ShardConfig:
+    """@shard - Automatic database sharding"""
+    shard_key: str
+    num_shards: int = 256
+    shard_strategy: str = "consistent-hash"  # consistent-hash, range, directory
+    rebalance_enabled: bool = True
+    migration_batch_size: int = 1000
+
+
+@dataclass
+class ConsistencyControl:
+    """@consistency - Eventual consistency control"""
+    model: str
+    level: str = "eventual"  # eventual, causal, strong, linearizable
+    ttl: int = 5000  # milliseconds for consistency window
+    sync_interval: int = 1000  # milliseconds between syncs
+    conflict_free: bool = False  # CRDT-based
+
+
+@dataclass
+class GeoDistribution:
+    """@geodistribute - Global distribution"""
+    regions: Dict[str, Dict[str, Any]] = field(default_factory=dict)  # region -> config
+    primary_region: str = "us-east-1"
+    edge_locations: List[str] = field(default_factory=list)
+    data_residency: str = "local"  # local, global, compliant
+    latency_target_ms: int = 50
+
+
+@dataclass
+class EdgeComputing:
+    """@edge - Edge computing deployment"""
+    function_name: str
+    edge_locations: List[str] = field(default_factory=list)
+    cache_behavior: str = "cache-first"  # cache-first, network-first, stale-while-revalidate
+    timeout_ms: int = 5000
+    enable_compression: bool = True
+
+
+@dataclass
+class APIGatewayConfig:
+    """@apigateway - API gateway routing at scale"""
+    name: str
+    routes: Dict[str, str] = field(default_factory=dict)  # pattern -> backend
+    rate_limit_strategy: str = "token-bucket"
+    auth_type: str = "oauth2"
+    enable_caching: bool = True
+    cache_ttl_seconds: int = 300
+
+
+@dataclass
+class ServiceMesh:
+    """@mesh - Service mesh (Istio-style)"""
+    name: str
+    services: List[str] = field(default_factory=list)
+    mtls_enabled: bool = True
+    traffic_policy: str = "round-robin"  # round-robin, least-conn, random
+    circuit_breaker: bool = True
+    max_retries: int = 3
+
+
+@dataclass
+class MonitoringConfig:
+    """@monitor - Advanced observability"""
+    metrics: List[str] = field(default_factory=list)
+    sampling_rate: float = 0.1  # 0-1, percentage of requests
+    log_level: str = "info"
+    enable_profiling: bool = False
+    retention_days: int = 30
+    aggregation_interval: int = 60  # seconds
+
+
+@dataclass
+class AlertConfig:
+    """@alert - Alert management"""
+    name: str
+    condition: str
+    threshold: float
+    duration: int  # seconds
+    severity: str = "info"  # info, warning, critical
+    notify_channels: List[str] = field(default_factory=list)
+
+
+@dataclass
+class AutoScalingConfig:
+    """@capacity - Auto-scaling rules"""
+    metric: str
+    target_value: float
+    min_capacity: int
+    max_capacity: int
+    scale_up_threshold: int = 80
+    scale_down_threshold: int = 30
+    cooldown_period: int = 300  # seconds
+
+
+@dataclass
+class BillingConfig:
+    """@billing - Billing system"""
+    pricing_model: str = "pay-per-use"  # pay-per-use, fixed, tiered
+    billing_cycle: str = "monthly"
+    currency: str = "USD"
+    components: Dict[str, float] = field(default_factory=dict)  # component -> rate
+    discount_tiers: List[Dict] = field(default_factory=list)
+
+
+@dataclass
+class DDoSProtection:
+    """@ddosprotection - DDoS protection"""
+    enabled: bool = True
+    detection_mode: str = "adaptive"  # adaptive, signature-based, behavioral
+    rate_limit_per_ip: int = 10000  # requests per minute
+    block_duration: int = 300  # seconds
+    allow_list: List[str] = field(default_factory=list)
+    deny_list: List[str] = field(default_factory=list)
+
+
+@dataclass
+class ComplianceConfig:
+    """@compliance - Regulatory compliance"""
+    frameworks: List[str] = field(default_factory=list)  # GDPR, HIPAA, PCI-DSS, etc.
+    data_retention_policy: str = "7-years"
+    encryption_at_rest: bool = True
+    encryption_in_transit: bool = True
+    audit_logging: bool = True
+    right_to_be_forgotten: bool = True
 
 
 # Global backend registry instance
