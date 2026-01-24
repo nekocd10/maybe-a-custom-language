@@ -1,4 +1,0 @@
-[console_scripts]
-nexus = src.cli:main
-nexus-pm = src.package_manager:main
-nxs = src.cli:main
